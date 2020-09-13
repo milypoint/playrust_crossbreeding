@@ -49,8 +49,9 @@ def delete(args):
 
 
 def wipe(args):
+    name = GenesDB().name
     GenesDB().delete_db()
-    GenesDB()
+    GenesDB(name)
     print(co.green('Done!'))
     return True
 
