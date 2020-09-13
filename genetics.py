@@ -107,5 +107,5 @@ class Genetics(object):
             print()
             print(f'{co.underline("Wanted gene:")} "{co.gene(w)}"')
             o = [o for o in out if o[3] == w]
-            print_list([f'Master gene: "{co.gene(i[0])}" Slave genes: {{{" ".join(map(co.gene, i[1]))}}} Result genes: {{{", ".join(map(co.gene, i[2]))}}}' for i in o])
+            print_list([f'Master gene: "{co.gene(i[0])}" Slave genes: {{{", ".join(map(co.gene, i[1]))}}} Result genes: {{{", ".join(map(co.gene, i[2]))}}}' for i in o])
         return False
