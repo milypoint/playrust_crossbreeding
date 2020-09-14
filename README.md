@@ -8,6 +8,8 @@ Program for search sets of exists genes for crossbreeding genes.
 
 Look for config.py for basic setup. 
 
+Type `help` after running the program for see available commands.
+
 For using colored output use [Windows Terminal](https://www.microsoft.com/ru-ru/p/windows-terminal/9n0dx20hk701) or different terminal that provide colored output.
 
 ![Screenshot](https://github.com/milypoint/playrust_crossbreeding/blob/master/data/screenshot.png?raw=true)
