@@ -110,6 +110,8 @@ def help(args):
 
 
 def main():
+    if not config.colored_output:
+        bcolors().disable()
     if os.path.exists(config.last_log_file):
         with open(config.last_log_file, 'r') as f:
             name = f.readline()
