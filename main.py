@@ -115,12 +115,15 @@ def main():
             name = f.readline()
             GenesDB(name)
             print(f'{co.bold("Connected to database")} "{GenesDB().filename_start}/{GenesDB().name}{GenesDB().filename_end}"')
-    while True:
-        i = input()
-        if i.split()[0] not in commands.keys():
-            print(co.yellow(f'Command <{i}> not found.'))
-            continue
-        globals()[i.split()[0]](i.split())
+    try:
+        while True:
+            i = input()
+            if i.split()[0] not in commands.keys():
+                print(co.yellow(f'Command <{i}> not found.'))
+                continue
+            globals()[i.split()[0]](i.split())
+    except KeyboardInterrupt as e:
+        print(co.blue("Exit."))
 
 
 if __name__ == '__main__':
