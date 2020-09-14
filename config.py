@@ -6,7 +6,8 @@ wanted_genes = [
     'YYYYGG',
     'YYGGGG',
     'YYYGGH',
+    'YYHGGG',
     'YYXGGG',
     'YYYGGX',
-    'YYHGGG'
+
 ]

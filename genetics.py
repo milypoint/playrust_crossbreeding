@@ -106,6 +106,14 @@ class Genetics(object):
         for w in self.wanted_any_genes:
             print()
             print(f'{co.underline("Wanted gene:")} "{co.gene(w)}"')
-            o = [o for o in out if o[3] == w]
-            print_list([f'Master gene: "{co.gene(i[0])}" Slave genes: {{{", ".join(map(co.gene, i[1]))}}} Result genes: {{{", ".join(map(co.gene, i[2]))}}}' for i in o])
+            min_res_genes_count = min([len(i[2]) for i in out]) if len(out) else 0
+            o = [o for o in out if o[3] == w and len(o[2]) == min_res_genes_count]
+            min_slaves_count = min([len(i[1]) for i in o]) if len(o) else 0
+            o = [_o for _o in o if len(_o[1]) == min_slaves_count]
+            if len(o):
+                o = o[:1]
+                print_list([f'Master gene: "{co.gene(i[0])}" Slave genes: {{{", ".join(map(co.gene, i[1]))}}} Result '
+                            f'genes: {{{", ".join(map(co.gene, i[2]))}}}' for i in o])
+            else:
+                print('No result.')
         return False
