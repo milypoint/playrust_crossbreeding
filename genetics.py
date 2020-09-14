@@ -109,7 +109,7 @@ class Genetics(object):
             min_res_genes_count = min([len(i[2]) for i in out]) if len(out) else 0
             o = [o for o in out if o[3] == w and len(o[2]) == min_res_genes_count]
             min_slaves_count = min([len(i[1]) for i in o]) if len(o) else 0
-            o = [_o for _o in o if len(_o[1]) == min_slaves_count]
+            o = [_o for _o in o if len(_o[1]) == min_slaves_count and not self.is_wanted_gene(_o[0], w)]
             if len(o):
                 o = o[:1]
                 print_list([f'Master gene: "{co.gene(i[0])}" Slave genes: {{{", ".join(map(co.gene, i[1]))}}} Result '
