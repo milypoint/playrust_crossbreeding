@@ -12,14 +12,15 @@ from data.gene_set import GENES_SET
 
 def pool_action(args):
     gene = args[0]
-    comb = args[1]
-    for c in comb:
-        cross_res = Genetics().cross_breeding(gene, c)
-        for ii in cross_res:
-            is_wanted = Genetics().is_wanted_any_gene(ii)
-            if is_wanted:
-                return gene, c, Genetics().cross_breeding(gene, c), is_wanted
-    return False
+    combinations = args[1]
+    res = []
+    for combination in combinations:
+        crossbreeding_result = Genetics().crossbreeding(gene, combination)
+        for ii in crossbreeding_result:
+            is_wanted_gene = Genetics().is_wanted_any_gene(ii)
+            if is_wanted_gene:
+                res.append([gene, combination, crossbreeding_result, is_wanted_gene])
+    return res
 
 
 @singleton.singleton
@@ -27,12 +28,14 @@ class Genetics(object):
 
     def __init__(self):
         self.wanted_any_genes = config.wanted_genes
-        self.genes = set()
+        self.genes = []
 
     def add(self, gene):
-        self.genes.add(gene)
+        if gene not in self.genes:
+            self.genes.append(gene)
 
-    def cross_breeding(self, center, surround):
+    @staticmethod
+    def crossbreeding(master, slaves):
         def split_res(data):
             for idx, gene_set in enumerate(data):
                 for pos, gene in enumerate(gene_set):
@@ -44,45 +47,31 @@ class Genetics(object):
             for line in data:
                 line = ''.join([_i[0] for _i in line])
                 result.add(line)
-            return result
+            return list(result)
 
-        if len(surround) > 8:
+        def genetics_calc(master_gene, slave_genes):
+            gene_values = {k: 0 for k, v in GENES_SET.copy().items()}
+            for g in slave_genes:
+                gene_values[g] += GENES_SET[g]
+            res = [g for g, v in gene_values.items() if v == max(gene_values.values()) and v > GENES_SET[master_gene]]
+            return res if len(res) else [master_gene]
+
+        if len(slaves) > 8:
             print("Max surround count is 8.")
             sys.exit()
-        res = []
-        for i in range(6):
-            genes_value = GENES_SET.copy()
-            for gene in genes_value.keys():
-                genes_value[gene] = 0
-            genes_value[center[i]] += GENES_SET[center[i]]
-            for gene in surround:
-                genes_value[gene[i]] += GENES_SET[gene[i]]
-            max_val = 0
-            for value in genes_value.values():
-                if max_val < value:
-                    max_val = value
-            res_g = []
-            for k, v in genes_value.items():
-                if v == max_val:
-                    res_g.append(k)
-            if len(res_g) > 1 and center[i] in res_g:
-                res_g = [center[i]]
-            res.append(res_g)
+
+        res = [genetics_calc(master[i], [g[i] for g in slaves]) for i in range(6)]
         return split_res([res])
 
     def is_wanted_gene(self, gene, wanted_gene):
-        genes_set = GENES_SET.copy()
-        for g in genes_set.keys():
-            genes_set[g] = 0
+        gene_values = {k: 0 for k, v in GENES_SET.copy().items()}
+        wanted_genes_values = gene_values.copy()
         for g in gene:
-            genes_set[g] += 1
-        wanted_genes_set = GENES_SET.copy()
-        for g in wanted_genes_set.keys():
-            wanted_genes_set[g] = 0
+            gene_values[g] += 1
         for g in wanted_gene:
-            wanted_genes_set[g] += 1
+            wanted_genes_values[g] += 1
         for g in gene:
-            if genes_set[g] != wanted_genes_set[g]:
+            if gene_values[g] != wanted_genes_values[g]:
                 return False
         return True
 
@@ -93,27 +82,33 @@ class Genetics(object):
         return False
 
     def tryhard(self):
-        print(f'{co.underline("Genes set:")} {{{", ".join(map(co.gene, self.genes))}}}')
+        print(f'{co.underline(f"Genes set: ({len(self.genes)})")} {{{", ".join(map(co.gene, self.genes))}}}')
         data_set = []
         for pos, gene in enumerate(self.genes):
-            genes_set = [list(self.genes)[i] for i in range(len(self.genes)) if i != pos]
+            genes_set = [self.genes[i] for i in range(len(self.genes)) if i != pos]
             for i in range(1, 9):
                 comb = itertools.combinations(genes_set, i)
                 data_set.append([gene, comb])
+                # 50/50 method:
+                if i == 2:
+                    data_set.append([gene, [(gene, ) + c for c in comb]])
         p = Pool()
-        out = [o for o in p.map(pool_action, data_set) if o and len(o[2]) <= 8]
-        out = sorted(out, key=lambda i: len(i[2]))
+        out = []
+        for o in p.map(pool_action, data_set):
+            for _o in o:
+                if len(_o) and len(_o[2]) <= 8:
+                    out.append(_o)
         for w in self.wanted_any_genes:
+            out_by_w = [o for o in out if o[3] == w]
             print()
             print(f'{co.underline("Wanted gene:")} "{co.gene(w)}"')
-            min_res_genes_count = min([len(i[2]) for i in out]) if len(out) else 0
-            o = [o for o in out if o[3] == w and len(o[2]) == min_res_genes_count]
+            min_res_genes_count = min([len(i[2]) for i in out_by_w]) if len(out_by_w) else 0
+            o = [o for o in out_by_w if len(o[2]) == min_res_genes_count]
             min_slaves_count = min([len(i[1]) for i in o]) if len(o) else 0
             o = [_o for _o in o if len(_o[1]) == min_slaves_count and not self.is_wanted_gene(_o[0], w)]
             if len(o):
-                o = o[:1]
                 print_list([f'Master gene: "{co.gene(i[0])}" Slave genes: {{{", ".join(map(co.gene, i[1]))}}} Result '
-                            f'genes: {{{", ".join(map(co.gene, i[2]))}}}' for i in o])
+                            f'genes: {{{", ".join(map(co.gene, i[2]))}}} {"50/50 method" if i[0] in i[1] else ""}' for i in o])
             else:
                 print('No result.')
         return False

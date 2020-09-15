@@ -97,7 +97,7 @@ def stop(args):
 
 
 def action(args):
-    Genetics().genes = set()
+    Genetics().genes = []
     for i in GenesDB().get_all():
         Genetics().add(i[1])
     Genetics().tryhard()
