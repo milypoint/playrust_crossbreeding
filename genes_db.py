@@ -19,14 +19,17 @@ class GenesDB(object, metaclass=Singleton):
             del self
             return
         self.name = name
+        self.file = f"{self.filename_start}/{self.name}{self.filename_end}"
         self.db_init()
 
     def db_init(self):
-        if os.path.exists(f"{self.filename_start}/{self.name}{self.filename_end}"):
+        if not os.path.exists(self.filename_start):
+            os.makedirs(self.filename_start)
+        if os.path.exists(f"{self.file}"):
             file_exists = True
         else:
             file_exists = False
-        self.conn = sqlite3.connect(f'./{self.filename_start}/{self.name}{self.filename_end}')
+        self.conn = sqlite3.connect(f'./{self.file}')
         self.cursor = self.conn.cursor()
         if not file_exists:
             sql_create_table = """
@@ -77,15 +80,14 @@ class GenesDB(object, metaclass=Singleton):
             return True
 
     def delete_db(self):
-        file_name = f"{self.filename_start}/{self.name}{self.filename_end}"
-        if os.path.exists(file_name):
+        if os.path.exists(self.file):
             self.conn.close()
-            os.remove(file_name)
-            print(f"{file_name} removed.")
+            os.remove(self.file)
+            print(f"{self.file} removed.")
             type(self.__class__)._instances = {}
             del self
         else:
-            print(f"File {file_name} not exists.")
+            print(f"File {self.file} not exists.")
 
     def validate(self, genes):
         if len([g for g in genes if g.upper() in GENES_SET]) != 6:
