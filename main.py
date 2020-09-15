@@ -22,8 +22,6 @@ commands = {
 
 last_log = 'data/last.log'
 
-insta_work = False
-
 
 def create(args):
     if len(args) != 2:
@@ -116,7 +114,9 @@ def main():
         with open(config.last_log_file, 'r') as f:
             name = f.readline()
             GenesDB(name)
-            print(f'{co.bold("Connected to database")} "{GenesDB().filename_start}/{GenesDB().name}{GenesDB().filename_end}"')
+            print(f'{co.yellow("Connected to database")} '
+                  f'{co.yellow(f"{GenesDB().filename_start}/{GenesDB().name}{GenesDB().filename_end}")}')
+    print(f"Type {co.yellow('help')} for see available commands.")
     try:
         while True:
             i = input()
