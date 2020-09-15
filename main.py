@@ -1,4 +1,6 @@
 import os
+import time
+import datetime
 
 import config
 
@@ -95,10 +97,13 @@ def stop(args):
 
 
 def action(args):
+    BEFORE = time.perf_counter()
     Genetics().genes = []
     for i in GenesDB().get_all():
         Genetics().add(i[1])
+    print(co.yellow("Calculating... May take a long time if many inputs genes."))
     Genetics().tryhard()
+    print(co.green(f'Done! {datetime.timedelta(seconds=round(time.perf_counter() - BEFORE))}'))
     return True
 
 
@@ -117,6 +122,7 @@ def main():
             print(f'{co.yellow("Connected to database")} '
                   f'{co.yellow(f"{GenesDB().filename_start}/{GenesDB().name}{GenesDB().filename_end}")}')
     print(f"Type {co.yellow('help')} for see available commands.")
+    print("Enter command:")
     try:
         while True:
             i = input()
