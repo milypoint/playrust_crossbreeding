@@ -13,7 +13,7 @@ class GenesDB(object, metaclass=Singleton):
     filename_end = '.sqlite'
 
     def __init__(self, name=None):
-        if hasattr(self, 'name') and name is None:
+        if not hasattr(self, 'name') and name is None:
             print('Parameter <name> is missing.')
             type(self.__class__)._instances = {}
             del self
