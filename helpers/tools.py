@@ -76,3 +76,12 @@ def die(msg=None, items=False):
 def print_list(l):
     for i in l:
         print(i)
+
+
+def timedelta_format(s):
+    hours = s // 3600
+    s = s - (hours * 3600)
+    minutes = s // 60
+    seconds = s - (minutes * 60)
+    milliseconds = s % 1 * 100
+    return '{:02}h:{:02}m:{:02}s:{:02}ms'.format(int(hours), int(minutes), int(seconds), int(milliseconds))

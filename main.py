@@ -103,7 +103,7 @@ def action(args):
         Genetics().add(i[1])
     print(co.yellow("Calculating... May take a long time if many inputs genes."))
     Genetics().tryhard()
-    print(co.green(f'Done! {datetime.timedelta(seconds=round(time.perf_counter() - BEFORE))}'))
+    print(co.green(f'Done in {timedelta_format(time.perf_counter() - BEFORE)}'))
     return True
 
 
